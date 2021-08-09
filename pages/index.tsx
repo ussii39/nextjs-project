@@ -1,8 +1,20 @@
 import Head from "next/head";
 import Image from "next/image";
 import React, { FC, useEffect, useState } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    "& > *": {
+      margin: theme.spacing(1),
+      width: "25ch",
+    },
+  },
+}));
 
 export default function Home() {
+  const classes = useStyles();
   const [password, Setpassword] = useState("");
   const [name, Setname] = useState("");
 
@@ -22,17 +34,34 @@ export default function Home() {
       username: name,
       password: password,
     };
-    const response = await fetch(
-      "https://www.ussii-1th-engnier.com/authen/jwt/create",
-      {
-        method: "POST",
-        body: JSON.stringify(body),
-        headers,
-      }
-    ).then((response) => {
-      return response.json();
-    });
-    console.log(response);
+    try {
+      const responseUserInfo = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/create/`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers: headers,
+        }
+      ).then((response) => response.json());
+      console.log(responseUserInfo);
+    } catch (err) {
+      console.log(err);
+    }
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/authen/jwt/create/`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+          headers,
+        }
+      ).then((response) => {
+        return response.json();
+      });
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
   };
   return (
     <div className="min-h-screen py-0 px-2 flex flex-col justify-center items-center">
@@ -42,8 +71,19 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <h1>hello World</h1>
-      <input type="text" value={name} onChange={handleInputChange} />
-      <input type="password" value={password} onChange={handleInputPassword} />
+      <form className={classes.root} noValidate autoComplete="off">
+        <TextField
+          id="standard-basic"
+          label="ユーザー名"
+          value={name}
+          onChange={handleInputChange}
+        />
+        <TextField
+          id="standard-basic"
+          label="パスワード"
+          onChange={handleInputPassword}
+        />
+      </form>
 
       <button onClick={auth}>認証</button>
       {/* <footer className={styles.footer}>
